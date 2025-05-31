@@ -1,4 +1,4 @@
-# lockdep project - Operating Systems class UFRN
+# lockdep
 
 ## One-time setup
 

@@ -1,8 +1,36 @@
 # TODO's
 
-- [ ] Create release/debug build configuration for enabling lockdep during runtime.
-- [ ] Come up with examples that shows lockdep in action.
-- [ ] Raise the remaining things that need to be done in the project.
+## Core
+
+- [ ] Add thread safety protection for global state (lock_registry, dependency_list, thread_contexts)
+- [ ] Implement basic lock node management (find/create lock nodes)
+- [ ] Implement thread context management (find/create thread contexts)
+- [ ] Implement held lock stack operations (push/pop for nested locks)
+- [ ] Implement dependency edge management (add/find dependencies)
+- [ ] Implement cycle detection algorithm (DFS based? Linux is like this)
+- [ ] Implement cleanup in lockdep_cleanup()
+
+## Performance
+
+- [ ] Optimize lock node lookups (consider hash tables vs linear search)
+- [ ] Optimize thread context lookups for better performance
+- [ ] Consider memory pools for frequent allocations/deallocations
+- [ ] Add configuration for max dependency graph size to prevent memory exhaustion
+
+## Interposition
+
+- [ ] Complete pthread function interposition (lock/unlock/trylock)
+- [ ] Add support for other synchronization primitives (semaphores, condition variables)
+- [ ] Implement recursion detection to avoid lockdep validating itself
+
+## Testing
+
+- [ ] Create more stressful test programs to cover various locking scenarios
+- [ ] Add performance benchmarks comparing with/without lockdep
+
+## Docs
+
+- [ ] Document performance overhead and limitations
 
 ## Resources
 

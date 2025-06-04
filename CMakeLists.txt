@@ -20,11 +20,36 @@ set(COMPILE_OPTIONS
 
 set(LINK_OPTIONS "-fsanitize=address,undefined")
 
-file(GLOB SOURCES "src/*.c")
+# Core lockdep library sources
+file(GLOB LOCKDEP_SOURCES
+    "src/lockdep/*.c"
+)
+
+# Library interposition sources
+file(GLOB INTERPOSE_SOURCES
+    "src/interpose/*.c"
+    "src/lockdep/*.c"
+)
+
+# Test program sources
+file(GLOB TEST_SOURCES "tests/*.c")
+
+# Include directories
 include_directories(src/include)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+# Build the shared library for LD_PRELOAD
+add_library(lockdep_interpose SHARED ${INTERPOSE_SOURCES})
+target_compile_options(lockdep_interpose PRIVATE ${COMPILE_OPTIONS})
+target_link_options(lockdep_interpose PRIVATE ${LINK_OPTIONS})
+target_link_libraries(lockdep_interpose PRIVATE dl pthread)
 
-target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILE_OPTIONS})
-
-target_link_options(${PROJECT_NAME} PRIVATE ${LINK_OPTIONS})
+# Build test programs
+if(TEST_SOURCES)
+    foreach(test_file ${TEST_SOURCES})
+        get_filename_component(test_name ${test_file} NAME_WE)
+        add_executable(${test_name} ${test_file})
+        target_compile_options(${test_name} PRIVATE ${COMPILE_OPTIONS})
+        target_link_options(${test_name} PRIVATE ${LINK_OPTIONS})
+        target_link_libraries(${test_name} PRIVATE pthread)
+    endforeach()
+endif()

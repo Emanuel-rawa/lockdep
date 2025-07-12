@@ -21,7 +21,7 @@ for test_binary in $TEST_BINARIES; do
     echo "===================================="
     echo "== TESTING $test_binary =="
 
-    LD_PRELOADER=./liblockdep_interpose.so $test_binary
+    LD_PRELOAD=./liblockdep_interpose.so $test_binary
 
     echo "===================================="
 done

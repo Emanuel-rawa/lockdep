@@ -70,14 +70,14 @@ void destroy_list() {
 
 // Thread that locks array elements in ascending order
 void* ascending_thread(void* arg) {
-    struct arg_t* args = (struct arg_t*) arg;
+    struct arg_t* args = (struct arg_t*)arg;
 
     printf("Thread %d: Locking array elements in ascending order\n", args->id);
 
     for (int i = 0; i < LOCK_COUNT; i++) {
         printf("Thread %d: Acquiring lock %d\n", args->id, i);
         pthread_mutex_lock(&lock_array[i]);
-        usleep(10000); // Small delay to increase interleaving probability
+        usleep(10000);  // Small delay to increase interleaving probability
     }
 
     printf("Thread %d: All locks acquired, now releasing\n", args->id);
@@ -93,7 +93,7 @@ void* ascending_thread(void* arg) {
 
 // Thread that locks array elements in descending order
 void* descending_thread(void* arg) {
-    struct arg_t* args = (struct arg_t*) arg;
+    struct arg_t* args = (struct arg_t*)arg;
 
     printf("Thread %d: Locking array elements in descending order\n", args->id);
 
@@ -103,7 +103,7 @@ void* descending_thread(void* arg) {
     for (int i = LOCK_COUNT - 1; i >= 0; i--) {
         printf("Thread %d: Acquiring lock %d\n", args->id, i);
         pthread_mutex_lock(&lock_array[i]);
-        usleep(10000); // Small delay to increase interleaving probability
+        usleep(10000);  // Small delay to increase interleaving probability
     }
 
     printf("Thread %d: All locks acquired, now releasing\n", args->id);
@@ -159,8 +159,7 @@ void* dynamic_lock_thread(void* arg) {
 // Thread that traverses and locks nodes in a linked list
 void* list_thread(void* arg) {
     int direction = *((int*)arg);  // 1 for forward, -1 for backward
-    printf("Thread %d: Traversing list in %s order\n",
-           direction == 1 ? 4 : 5,
+    printf("Thread %d: Traversing list in %s order\n", direction == 1 ? 4 : 5,
            direction == 1 ? "forward" : "backward");
 
     if (direction == 1) {
@@ -169,7 +168,7 @@ void* list_thread(void* arg) {
         while (current != NULL) {
             printf("Thread 4: Locking node with value %d\n", current->value);
             pthread_mutex_lock(&current->lock);
-            usleep(50000); // Sleep to make deadlocks more likely
+            usleep(50000);  // Sleep to make deadlocks more likely
             current = current->next;
         }
 
@@ -206,7 +205,7 @@ void* list_thread(void* arg) {
         for (int i = count - 1; i >= 0; i--) {
             printf("Thread 5: Locking node with value %d\n", nodes[i]->value);
             pthread_mutex_lock(&nodes[i]->lock);
-            usleep(50000); // Sleep to make deadlocks more likely
+            usleep(50000);  // Sleep to make deadlocks more likely
         }
 
         // Unlock in same order
@@ -227,7 +226,9 @@ int main() {
     int forward = 1, backward = -1;
 
     printf("Starting dynamic locks deadlock test\n");
-    printf("This test demonstrates various deadlock scenarios with dynamic locks\n\n");
+    printf(
+        "This test demonstrates various deadlock scenarios with dynamic "
+        "locks\n\n");
 
     // Initialize array of locks
     lock_array = malloc(LOCK_COUNT * sizeof(pthread_mutex_t));
@@ -244,7 +245,8 @@ int main() {
     create_list(LOCK_COUNT);
 
     printf("1. Testing lock acquisition order with dynamic array locks\n");
-    printf("   This should cause a deadlock if both threads run concurrently\n");
+    printf(
+        "   This should cause a deadlock if both threads run concurrently\n");
 
     // Uncomment to see the actual deadlock
     /*
@@ -257,11 +259,11 @@ int main() {
 
     struct arg_t arg1 = {1};
     // Instead of actual deadlock, run them separately
-    pthread_create(&t1, NULL, ascending_thread, (void *) &arg1);
+    pthread_create(&t1, NULL, ascending_thread, (void*)&arg1);
     pthread_join(t1, NULL);
 
     struct arg_t arg2 = {2};
-    pthread_create(&t2, NULL, descending_thread, (void *) &arg2);
+    pthread_create(&t2, NULL, descending_thread, (void*)&arg2);
     pthread_join(t2, NULL);
 
     printf("\n2. Testing dynamically created locks within a thread\n");

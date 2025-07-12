@@ -26,9 +26,15 @@ void print_states() {
     for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
         printf("%d:", i);
         switch (state[i]) {
-            case THINKING: printf("🤔 "); break;
-            case HUNGRY: printf("😋 "); break;
-            case EATING: printf("🍝 "); break;
+            case THINKING:
+                printf("🤔 ");
+                break;
+            case HUNGRY:
+                printf("😋 ");
+                break;
+            case EATING:
+                printf("🍝 ");
+                break;
         }
     }
     printf("\n");
@@ -79,7 +85,8 @@ void* philosopher(void* arg) {
         usleep(500000);
 
         // Pick up second fork
-        printf("Philosopher %d is trying to pick up fork %d\n", id, second_fork);
+        printf("Philosopher %d is trying to pick up fork %d\n", id,
+               second_fork);
         fflush(stdout);
         pthread_mutex_lock(&forks[second_fork]);
         printf("Philosopher %d picked up fork %d\n", id, second_fork);
@@ -138,8 +145,11 @@ int main() {
     }
 
     printf("\nAll philosophers have finished dining.\n");
-    printf("Note: This implementation avoids deadlock by having one philosopher\n");
-    printf("pick up forks in a different order. To see a deadlock, modify the\n");
+    printf(
+        "Note: This implementation avoids deadlock by having one "
+        "philosopher\n");
+    printf(
+        "pick up forks in a different order. To see a deadlock, modify the\n");
     printf("philosopher function to always pick up the left fork first.\n");
     fflush(stdout);
 

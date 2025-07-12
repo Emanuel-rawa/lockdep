@@ -19,7 +19,6 @@
 
 typedef struct adjacent_locks adjacency_locks_t;
 
-
 // Node representing a lock in the lock dependency graph.
 typedef struct lock_node {
     const void* lock_addr;        // Address of the lock.

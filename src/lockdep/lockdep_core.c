@@ -26,8 +26,7 @@ static lock_node_t* find_or_create_lock(const void* lock_addr)
     lock_node_t* lock = lock_registry;
 
     while (lock) {
-        if (lock->lock_addr == lock_addr)
-            return lock;
+        if (lock->lock_addr == lock_addr) return lock;
         lock = lock->next;
     }
 
@@ -42,8 +41,7 @@ static thread_context_t* find_thread_context(const pthread_t thread_id)
 {
     thread_context_t* ctx = thread_registry;
     while (ctx) {
-        if (ctx->thread_id == thread_id)
-            return ctx;
+        if (ctx->thread_id == thread_id) return ctx;
         ctx = ctx->next;
     }
     return NULL;

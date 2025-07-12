@@ -23,11 +23,11 @@ void lockdep_cleanup(void) {
     return;
 }
 
-bool lockdep_acquire_lock(void* lock_addr) {
+bool lockdep_acquire_lock(const void* lock_addr) {
     printf("[LOCKDEP] Acquiring lock at %p\n", lock_addr);
     return true;
 }
 
-void lockdep_release_lock(void* lock_addr) {
+void lockdep_release_lock(const void* lock_addr) {
     printf("[LOCKDEP] Releasing lock at %p\n", lock_addr);
 }

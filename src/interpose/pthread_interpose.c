@@ -1,5 +1,5 @@
+#include <asm-generic/errno-base.h>
 #include <dlfcn.h>
-#include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -28,12 +28,8 @@ __attribute__((constructor)) static void lockdep_constructor(void) {
     init_real_functions();
 }
 
-__attribute__((destructor)) static void lockdep_destructor(void) {
-    lockdep_cleanup();
-}
-
 /// The lockdep uses a mutex to protect its internal state, so we use this to
-/// avoid recursing lockdep validation across itself
+/// avoid recursing lockdep validation across itself.
 static __thread bool in_interpose = false;
 
 int pthread_mutex_lock(pthread_mutex_t* mutex) {
@@ -42,11 +38,8 @@ int pthread_mutex_lock(pthread_mutex_t* mutex) {
     if (lockdep_enabled && !in_interpose) {
         in_interpose = true;
         if (!lockdep_acquire_lock(mutex)) {
-            fprintf(
-                stderr,
-                "[LOCKDEP] DEADLOCK PREVENTED - refusing to acquire lock\n");
+            fprintf(stderr, "[LOCKDEP] DEADLOCK DETECTED\n");
             in_interpose = false;
-            return EDEADLK;
         }
         in_interpose = false;
     }

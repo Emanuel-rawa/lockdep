@@ -22,14 +22,16 @@ pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 
 // Helper function to create an absolute timeout
-struct timespec get_deadline(int seconds_from_now) {
+struct timespec get_deadline(int seconds_from_now)
+{
     struct timespec deadline;
     clock_gettime(CLOCK_REALTIME, &deadline);
     deadline.tv_sec += seconds_from_now;
     return deadline;
 }
 
-void* thread1_func(void* arg __attribute__((unused))) {
+void* thread1_func(void* arg __attribute__((unused)))
+{
     int retry_count = 0;
     const int max_retries = 3;
     const int timeout_seconds = 2;
@@ -41,10 +43,9 @@ void* thread1_func(void* arg __attribute__((unused))) {
         pthread_mutex_lock(&mutex1);
         printf("Thread 1: Got mutex1, sleeping...\n");
 
-        sleep(1);  // Sleep to ensure Thread 2 has time to acquire mutex2
+        sleep(1); // Sleep to ensure Thread 2 has time to acquire mutex2
 
-        printf("Thread 1: Trying to acquire mutex2 with %d second timeout\n",
-               timeout_seconds);
+        printf("Thread 1: Trying to acquire mutex2 with %d second timeout\n", timeout_seconds);
 
         struct timespec deadline = get_deadline(timeout_seconds);
         int result = pthread_mutex_timedlock(&mutex2, &deadline);
@@ -67,15 +68,13 @@ void* thread1_func(void* arg __attribute__((unused))) {
             return NULL;
         } else if (result == ETIMEDOUT) {
             // Timed out waiting for mutex2 - potential deadlock
-            printf(
-                "Thread 1: Timed out waiting for mutex2, releasing mutex1 to "
-                "avoid deadlock\n");
+            printf("Thread 1: Timed out waiting for mutex2, releasing mutex1 to "
+                   "avoid deadlock\n");
             pthread_mutex_unlock(&mutex1);
 
             // Backoff before retry
-            int backoff_time = (rand() % 3) + 1;  // 1-3 seconds
-            printf("Thread 1: Backing off for %d seconds before retry\n",
-                   backoff_time);
+            int backoff_time = (rand() % 3) + 1; // 1-3 seconds
+            printf("Thread 1: Backing off for %d seconds before retry\n", backoff_time);
             sleep(backoff_time);
 
             retry_count++;
@@ -91,7 +90,8 @@ void* thread1_func(void* arg __attribute__((unused))) {
     return NULL;
 }
 
-void* thread2_func(void* arg __attribute__((unused))) {
+void* thread2_func(void* arg __attribute__((unused)))
+{
     int retry_count = 0;
     const int max_retries = 3;
     const int timeout_seconds = 2;
@@ -103,10 +103,9 @@ void* thread2_func(void* arg __attribute__((unused))) {
         pthread_mutex_lock(&mutex2);
         printf("Thread 2: Got mutex2, sleeping...\n");
 
-        sleep(1);  // Sleep to ensure Thread 1 has time to acquire mutex1
+        sleep(1); // Sleep to ensure Thread 1 has time to acquire mutex1
 
-        printf("Thread 2: Trying to acquire mutex1 with %d second timeout\n",
-               timeout_seconds);
+        printf("Thread 2: Trying to acquire mutex1 with %d second timeout\n", timeout_seconds);
 
         struct timespec deadline = get_deadline(timeout_seconds);
         int result = pthread_mutex_timedlock(&mutex1, &deadline);
@@ -129,15 +128,13 @@ void* thread2_func(void* arg __attribute__((unused))) {
             return NULL;
         } else if (result == ETIMEDOUT) {
             // Timed out waiting for mutex1 - potential deadlock
-            printf(
-                "Thread 2: Timed out waiting for mutex1, releasing mutex2 to "
-                "avoid deadlock\n");
+            printf("Thread 2: Timed out waiting for mutex1, releasing mutex2 to "
+                   "avoid deadlock\n");
             pthread_mutex_unlock(&mutex2);
 
             // Backoff before retry
-            int backoff_time = (rand() % 3) + 1;  // 1-3 seconds
-            printf("Thread 2: Backing off for %d seconds before retry\n",
-                   backoff_time);
+            int backoff_time = (rand() % 3) + 1; // 1-3 seconds
+            printf("Thread 2: Backing off for %d seconds before retry\n", backoff_time);
             sleep(backoff_time);
 
             retry_count++;
@@ -153,7 +150,8 @@ void* thread2_func(void* arg __attribute__((unused))) {
     return NULL;
 }
 
-int main() {
+int main()
+{
     pthread_t t1, t2;
 
     printf("Timed Mutex Deadlock Avoidance Test\n");
@@ -173,13 +171,10 @@ int main() {
     pthread_join(t2, NULL);
 
     printf("\nTest completed\n");
-    printf(
-        "Note: The threads used timeouts to detect potential deadlock and\n");
-    printf(
-        "released resources to avoid permanent deadlock. In a real "
-        "application,\n");
-    printf(
-        "this technique can prevent the system from becoming unresponsive.\n");
+    printf("Note: The threads used timeouts to detect potential deadlock and\n");
+    printf("released resources to avoid permanent deadlock. In a real "
+           "application,\n");
+    printf("this technique can prevent the system from becoming unresponsive.\n");
 
     return 0;
 }

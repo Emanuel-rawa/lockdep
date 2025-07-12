@@ -5,7 +5,8 @@
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 
-int main() {
+int main()
+{
     printf("Starting simple lock ordering test\n");
 
     printf("Acquiring mutex1\n");

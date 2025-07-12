@@ -32,7 +32,8 @@ pthread_mutex_t* lock_array;
 node_t* list_head = NULL;
 
 // Create a linked list with 'count' nodes, each with its own mutex
-void create_list(int count) {
+void create_list(int count)
+{
     node_t* current = NULL;
 
     for (int i = 0; i < count; i++) {
@@ -57,7 +58,8 @@ void create_list(int count) {
 }
 
 // Free the linked list and destroy all mutexes
-void destroy_list() {
+void destroy_list()
+{
     node_t* current = list_head;
     while (current != NULL) {
         node_t* next = current->next;
@@ -69,7 +71,8 @@ void destroy_list() {
 }
 
 // Thread that locks array elements in ascending order
-void* ascending_thread(void* arg) {
+void* ascending_thread(void* arg)
+{
     struct arg_t* args = (struct arg_t*)arg;
 
     printf("Thread %d: Locking array elements in ascending order\n", args->id);
@@ -77,7 +80,7 @@ void* ascending_thread(void* arg) {
     for (int i = 0; i < LOCK_COUNT; i++) {
         printf("Thread %d: Acquiring lock %d\n", args->id, i);
         pthread_mutex_lock(&lock_array[i]);
-        usleep(10000);  // Small delay to increase interleaving probability
+        usleep(10000); // Small delay to increase interleaving probability
     }
 
     printf("Thread %d: All locks acquired, now releasing\n", args->id);
@@ -92,7 +95,8 @@ void* ascending_thread(void* arg) {
 }
 
 // Thread that locks array elements in descending order
-void* descending_thread(void* arg) {
+void* descending_thread(void* arg)
+{
     struct arg_t* args = (struct arg_t*)arg;
 
     printf("Thread %d: Locking array elements in descending order\n", args->id);
@@ -103,7 +107,7 @@ void* descending_thread(void* arg) {
     for (int i = LOCK_COUNT - 1; i >= 0; i--) {
         printf("Thread %d: Acquiring lock %d\n", args->id, i);
         pthread_mutex_lock(&lock_array[i]);
-        usleep(10000);  // Small delay to increase interleaving probability
+        usleep(10000); // Small delay to increase interleaving probability
     }
 
     printf("Thread %d: All locks acquired, now releasing\n", args->id);
@@ -118,7 +122,8 @@ void* descending_thread(void* arg) {
 }
 
 // Thread that creates its own locks dynamically
-void* dynamic_lock_thread(void* arg) {
+void* dynamic_lock_thread(void* arg)
+{
     int lock_count = *((int*)arg);
     printf("Thread 3: Creating %d dynamic locks\n", lock_count);
 
@@ -157,10 +162,10 @@ void* dynamic_lock_thread(void* arg) {
 }
 
 // Thread that traverses and locks nodes in a linked list
-void* list_thread(void* arg) {
-    int direction = *((int*)arg);  // 1 for forward, -1 for backward
-    printf("Thread %d: Traversing list in %s order\n", direction == 1 ? 4 : 5,
-           direction == 1 ? "forward" : "backward");
+void* list_thread(void* arg)
+{
+    int direction = *((int*)arg); // 1 for forward, -1 for backward
+    printf("Thread %d: Traversing list in %s order\n", direction == 1 ? 4 : 5, direction == 1 ? "forward" : "backward");
 
     if (direction == 1) {
         // Forward traversal
@@ -168,7 +173,7 @@ void* list_thread(void* arg) {
         while (current != NULL) {
             printf("Thread 4: Locking node with value %d\n", current->value);
             pthread_mutex_lock(&current->lock);
-            usleep(50000);  // Sleep to make deadlocks more likely
+            usleep(50000); // Sleep to make deadlocks more likely
             current = current->next;
         }
 
@@ -205,7 +210,7 @@ void* list_thread(void* arg) {
         for (int i = count - 1; i >= 0; i--) {
             printf("Thread 5: Locking node with value %d\n", nodes[i]->value);
             pthread_mutex_lock(&nodes[i]->lock);
-            usleep(50000);  // Sleep to make deadlocks more likely
+            usleep(50000); // Sleep to make deadlocks more likely
         }
 
         // Unlock in same order
@@ -220,15 +225,15 @@ void* list_thread(void* arg) {
     return NULL;
 }
 
-int main() {
+int main()
+{
     pthread_t t1, t2, t3, t4, t5;
     int dynamic_lock_count = 3;
     int forward = 1, backward = -1;
 
     printf("Starting dynamic locks deadlock test\n");
-    printf(
-        "This test demonstrates various deadlock scenarios with dynamic "
-        "locks\n\n");
+    printf("This test demonstrates various deadlock scenarios with dynamic "
+           "locks\n\n");
 
     // Initialize array of locks
     lock_array = malloc(LOCK_COUNT * sizeof(pthread_mutex_t));
@@ -245,8 +250,7 @@ int main() {
     create_list(LOCK_COUNT);
 
     printf("1. Testing lock acquisition order with dynamic array locks\n");
-    printf(
-        "   This should cause a deadlock if both threads run concurrently\n");
+    printf("   This should cause a deadlock if both threads run concurrently\n");
 
     // Uncomment to see the actual deadlock
     /*

@@ -21,27 +21,29 @@ pthread_mutex_t forks[NUM_PHILOSOPHERS];
 int state[NUM_PHILOSOPHERS];
 pthread_t philosophers[NUM_PHILOSOPHERS];
 
-void print_states() {
+void print_states()
+{
     printf("Philosophers: ");
     for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
         printf("%d:", i);
         switch (state[i]) {
-            case THINKING:
-                printf("🤔 ");
-                break;
-            case HUNGRY:
-                printf("😋 ");
-                break;
-            case EATING:
-                printf("🍝 ");
-                break;
+        case THINKING:
+            printf("🤔 ");
+            break;
+        case HUNGRY:
+            printf("😋 ");
+            break;
+        case EATING:
+            printf("🍝 ");
+            break;
         }
     }
     printf("\n");
     fflush(stdout);
 }
 
-void* philosopher(void* arg) {
+void* philosopher(void* arg)
+{
     int id = *(int*)arg;
     int left_fork = id;
     int right_fork = (id + 1) % NUM_PHILOSOPHERS;
@@ -85,8 +87,7 @@ void* philosopher(void* arg) {
         usleep(500000);
 
         // Pick up second fork
-        printf("Philosopher %d is trying to pick up fork %d\n", id,
-               second_fork);
+        printf("Philosopher %d is trying to pick up fork %d\n", id, second_fork);
         fflush(stdout);
         pthread_mutex_lock(&forks[second_fork]);
         printf("Philosopher %d picked up fork %d\n", id, second_fork);
@@ -113,7 +114,8 @@ void* philosopher(void* arg) {
     return NULL;
 }
 
-int main() {
+int main()
+{
     int ids[NUM_PHILOSOPHERS];
     srand(time(NULL));
 
@@ -145,11 +147,9 @@ int main() {
     }
 
     printf("\nAll philosophers have finished dining.\n");
-    printf(
-        "Note: This implementation avoids deadlock by having one "
-        "philosopher\n");
-    printf(
-        "pick up forks in a different order. To see a deadlock, modify the\n");
+    printf("Note: This implementation avoids deadlock by having one "
+           "philosopher\n");
+    printf("pick up forks in a different order. To see a deadlock, modify the\n");
     printf("philosopher function to always pick up the left fork first.\n");
     fflush(stdout);
 

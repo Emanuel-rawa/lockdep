@@ -21,7 +21,8 @@ pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 int resource1 = 0;
 int resource2 = 0;
 
-void* thread1_func(void* arg __attribute__((unused))) {
+void* thread1_func(void* arg __attribute__((unused)))
+{
     int retry_count = 0;
     const int max_retries = 5;
 
@@ -29,7 +30,7 @@ void* thread1_func(void* arg __attribute__((unused))) {
         printf("Thread 1: Acquiring mutex1\n");
         pthread_mutex_lock(&mutex1);
         printf("Thread 1: Got mutex1, sleeping briefly...\n");
-        usleep(100000);  // Sleep for 100ms to increase chance of contention
+        usleep(100000); // Sleep for 100ms to increase chance of contention
 
         printf("Thread 1: Trying to acquire mutex2 (trylock)\n");
         if (pthread_mutex_trylock(&mutex2) == 0) {
@@ -39,8 +40,7 @@ void* thread1_func(void* arg __attribute__((unused))) {
             // Critical section - update protected resources
             resource1 += 10;
             resource2 += 20;
-            printf("Thread 1: Updated resources: %d, %d\n", resource1,
-                   resource2);
+            printf("Thread 1: Updated resources: %d, %d\n", resource1, resource2);
 
             // Release locks in reverse order of acquisition
             pthread_mutex_unlock(&mutex2);
@@ -49,13 +49,12 @@ void* thread1_func(void* arg __attribute__((unused))) {
             return NULL;
         } else {
             // trylock failed, release mutex1 to prevent deadlock
-            printf(
-                "Thread 1: Could not get mutex2, releasing mutex1 and "
-                "retrying...\n");
+            printf("Thread 1: Could not get mutex2, releasing mutex1 and "
+                   "retrying...\n");
             pthread_mutex_unlock(&mutex1);
 
             // Wait a random amount of time before retrying to reduce contention
-            usleep((rand() % 500000) + 100000);  // Sleep for 100-600ms
+            usleep((rand() % 500000) + 100000); // Sleep for 100-600ms
             retry_count++;
         }
     }
@@ -64,7 +63,8 @@ void* thread1_func(void* arg __attribute__((unused))) {
     return NULL;
 }
 
-void* thread2_func(void* arg __attribute__((unused))) {
+void* thread2_func(void* arg __attribute__((unused)))
+{
     int retry_count = 0;
     const int max_retries = 5;
 
@@ -72,7 +72,7 @@ void* thread2_func(void* arg __attribute__((unused))) {
         printf("Thread 2: Acquiring mutex2\n");
         pthread_mutex_lock(&mutex2);
         printf("Thread 2: Got mutex2, sleeping briefly...\n");
-        usleep(100000);  // Sleep for 100ms to increase chance of contention
+        usleep(100000); // Sleep for 100ms to increase chance of contention
 
         printf("Thread 2: Trying to acquire mutex1 (trylock)\n");
         if (pthread_mutex_trylock(&mutex1) == 0) {
@@ -82,8 +82,7 @@ void* thread2_func(void* arg __attribute__((unused))) {
             // Critical section - update protected resources
             resource1 += 1;
             resource2 += 2;
-            printf("Thread 2: Updated resources: %d, %d\n", resource1,
-                   resource2);
+            printf("Thread 2: Updated resources: %d, %d\n", resource1, resource2);
 
             // Release locks in reverse order of acquisition
             pthread_mutex_unlock(&mutex1);
@@ -92,13 +91,12 @@ void* thread2_func(void* arg __attribute__((unused))) {
             return NULL;
         } else {
             // trylock failed, release mutex2 to prevent deadlock
-            printf(
-                "Thread 2: Could not get mutex1, releasing mutex2 and "
-                "retrying...\n");
+            printf("Thread 2: Could not get mutex1, releasing mutex2 and "
+                   "retrying...\n");
             pthread_mutex_unlock(&mutex2);
 
             // Wait a random amount of time before retrying to reduce contention
-            usleep((rand() % 500000) + 100000);  // Sleep for 100-600ms
+            usleep((rand() % 500000) + 100000); // Sleep for 100-600ms
             retry_count++;
         }
     }
@@ -107,15 +105,15 @@ void* thread2_func(void* arg __attribute__((unused))) {
     return NULL;
 }
 
-int main() {
+int main()
+{
     pthread_t t1, t2;
 
     // Initialize random number generator
     srand(time(NULL));
 
     printf("Starting trylock deadlock avoidance test\n");
-    printf(
-        "This test demonstrates how trylock can be used to avoid deadlocks\n");
+    printf("This test demonstrates how trylock can be used to avoid deadlocks\n");
     printf("Initial resource values: %d, %d\n", resource1, resource2);
 
     pthread_create(&t1, NULL, thread1_func, NULL);

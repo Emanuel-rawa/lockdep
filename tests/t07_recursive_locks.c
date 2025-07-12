@@ -22,20 +22,18 @@ pthread_mutexattr_t recursive_attr;
 int recursive_lock_count = 0;
 
 // A recursive function that attempts to lock the same mutex recursively
-void recursive_lock(pthread_mutex_t* mutex, const char* mutex_type, int depth,
-                    int max_depth) {
+void recursive_lock(pthread_mutex_t* mutex, const char* mutex_type, int depth, int max_depth)
+{
     if (depth >= max_depth) {
         printf("[%s] Max depth %d reached, returning\n", mutex_type, max_depth);
         return;
     }
 
-    printf("[%s] Attempting to acquire lock recursively (depth %d)\n",
-           mutex_type, depth);
+    printf("[%s] Attempting to acquire lock recursively (depth %d)\n", mutex_type, depth);
     int result = pthread_mutex_lock(mutex);
 
     if (result == 0) {
-        printf("[%s] Successfully acquired lock at depth %d\n", mutex_type,
-               depth);
+        printf("[%s] Successfully acquired lock at depth %d\n", mutex_type, depth);
         recursive_lock_count++;
 
         // Sleep briefly to make output readable
@@ -47,12 +45,12 @@ void recursive_lock(pthread_mutex_t* mutex, const char* mutex_type, int depth,
         printf("[%s] Unlocking at depth %d\n", mutex_type, depth);
         pthread_mutex_unlock(mutex);
     } else {
-        printf("[%s] Failed to acquire lock at depth %d: error %d\n",
-               mutex_type, depth, result);
+        printf("[%s] Failed to acquire lock at depth %d: error %d\n", mutex_type, depth, result);
     }
 }
 
-void* regular_mutex_thread(void* arg) {
+void* regular_mutex_thread(void* arg)
+{
     int max_depth = *((int*)arg);
     printf("Starting regular mutex test (will deadlock)...\n");
 
@@ -62,24 +60,24 @@ void* regular_mutex_thread(void* arg) {
     return NULL;
 }
 
-void* recursive_mutex_thread(void* arg) {
+void* recursive_mutex_thread(void* arg)
+{
     int max_depth = *((int*)arg);
     printf("Starting recursive mutex test...\n");
 
     // This should succeed for all recursive calls
     recursive_lock(&recursive_mutex, "Recursive", 0, max_depth);
 
-    printf(
-        "Recursive mutex test completed with %d successful recursive locks\n",
-        recursive_lock_count);
+    printf("Recursive mutex test completed with %d successful recursive locks\n", recursive_lock_count);
 
     return NULL;
 }
 
-int main() {
+int main()
+{
     pthread_t regular_thread, recursive_thread;
-    int regular_depth = 2;    // Will attempt to lock twice (causing deadlock)
-    int recursive_depth = 5;  // Will attempt to lock 5 times
+    int regular_depth = 2;   // Will attempt to lock twice (causing deadlock)
+    int recursive_depth = 5; // Will attempt to lock 5 times
 
     printf("Recursive Lock Test\n");
     printf("===================\n");
@@ -90,19 +88,16 @@ int main() {
     pthread_mutex_init(&recursive_mutex, &recursive_attr);
 
     printf("First testing recursive mutex (should succeed):\n");
-    pthread_create(&recursive_thread, NULL, recursive_mutex_thread,
-                   &recursive_depth);
+    pthread_create(&recursive_thread, NULL, recursive_mutex_thread, &recursive_depth);
     pthread_join(recursive_thread, NULL);
 
     printf("\nNow testing regular mutex (will deadlock):\n");
-    printf(
-        "NOTE: If lockdep is working, it should detect this potential "
-        "deadlock\n");
+    printf("NOTE: If lockdep is working, it should detect this potential "
+           "deadlock\n");
     printf("Otherwise, this program will hang indefinitely\n\n");
 
     // Uncomment to actually test the deadlocking behavior
-    pthread_create(&regular_thread, NULL, regular_mutex_thread,
-                   (void*)&regular_depth);
+    pthread_create(&regular_thread, NULL, regular_mutex_thread, (void*)&regular_depth);
     pthread_join(regular_thread, NULL);
 
     // We don't run the regular mutex test by default because it will deadlock

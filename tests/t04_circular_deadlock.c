@@ -20,15 +20,16 @@ pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex3 = PTHREAD_MUTEX_INITIALIZER;
 
-void* thread1_func(void* arg __attribute__((unused))) {
+void* thread1_func(void* arg __attribute__((unused)))
+{
     printf("Thread 1: Acquiring mutex1\n");
     pthread_mutex_lock(&mutex1);
     printf("Thread 1: Got mutex1, sleeping...\n");
 
-    sleep(1);  // Sleep to ensure other threads acquire their first locks
+    sleep(1); // Sleep to ensure other threads acquire their first locks
 
     printf("Thread 1: Trying to acquire mutex2\n");
-    pthread_mutex_lock(&mutex2);  // Will block when Thread 2 has it
+    pthread_mutex_lock(&mutex2); // Will block when Thread 2 has it
     printf("Thread 1: Got mutex2\n");
 
     // Cleanup (this code won't execute if deadlock occurs)
@@ -39,15 +40,16 @@ void* thread1_func(void* arg __attribute__((unused))) {
     return NULL;
 }
 
-void* thread2_func(void* arg __attribute__((unused))) {
+void* thread2_func(void* arg __attribute__((unused)))
+{
     printf("Thread 2: Acquiring mutex2\n");
     pthread_mutex_lock(&mutex2);
     printf("Thread 2: Got mutex2, sleeping...\n");
 
-    sleep(1);  // Sleep to ensure other threads acquire their first locks
+    sleep(1); // Sleep to ensure other threads acquire their first locks
 
     printf("Thread 2: Trying to acquire mutex3\n");
-    pthread_mutex_lock(&mutex3);  // Will block when Thread 3 has it
+    pthread_mutex_lock(&mutex3); // Will block when Thread 3 has it
     printf("Thread 2: Got mutex3\n");
 
     // Cleanup (this code won't execute if deadlock occurs)
@@ -58,15 +60,16 @@ void* thread2_func(void* arg __attribute__((unused))) {
     return NULL;
 }
 
-void* thread3_func(void* arg __attribute__((unused))) {
+void* thread3_func(void* arg __attribute__((unused)))
+{
     printf("Thread 3: Acquiring mutex3\n");
     pthread_mutex_lock(&mutex3);
     printf("Thread 3: Got mutex3, sleeping...\n");
 
-    sleep(1);  // Sleep to ensure other threads acquire their first locks
+    sleep(1); // Sleep to ensure other threads acquire their first locks
 
     printf("Thread 3: Trying to acquire mutex1\n");
-    pthread_mutex_lock(&mutex1);  // Will block when Thread 1 has it
+    pthread_mutex_lock(&mutex1); // Will block when Thread 1 has it
     printf("Thread 3: Got mutex1\n");
 
     // Cleanup (this code won't execute if deadlock occurs)
@@ -77,12 +80,12 @@ void* thread3_func(void* arg __attribute__((unused))) {
     return NULL;
 }
 
-int main() {
+int main()
+{
     pthread_t t1, t2, t3;
 
     printf("Starting three-thread circular deadlock test\n");
-    printf(
-        "This test demonstrates a circular wait deadlock with three threads\n");
+    printf("This test demonstrates a circular wait deadlock with three threads\n");
 
     pthread_create(&t1, NULL, thread1_func, NULL);
     pthread_create(&t2, NULL, thread2_func, NULL);

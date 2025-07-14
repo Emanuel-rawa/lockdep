@@ -10,7 +10,7 @@ echo "=================================="
 echo "== LISTING BINARIES OF TEST SET =="
 echo "=================================="
 for test_binary in $TEST_BINARIES; do
-    echo $test_binary
+  echo $test_binary
 done
 
 echo "====================================="
@@ -18,10 +18,10 @@ echo "== TESTING LD_PRELOADER INTERPOSER =="
 echo "====================================="
 for test_binary in $TEST_BINARIES; do
 
-    echo "===================================="
-    echo "== TESTING $test_binary =="
+  echo "===================================="
+  echo "== TESTING $test_binary =="
 
-    LD_PRELOAD=./liblockdep_interpose.so $test_binary
+  LD_PRELOAD=./liblockdep_interpose.so $test_binary
 
-    echo "===================================="
+  echo "===================================="
 done

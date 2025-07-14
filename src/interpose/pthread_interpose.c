@@ -1,5 +1,5 @@
+#include <asm-generic/errno-base.h>
 #include <dlfcn.h>
-#include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -11,7 +11,8 @@ static int (*real_pthread_mutex_unlock)(pthread_mutex_t*) = NULL;
 static int (*real_pthread_mutex_trylock)(pthread_mutex_t*) = NULL;
 
 /// This interposes the real pthread mutex functions to add lockdep validation
-static void init_real_functions(void) {
+static void init_real_functions(void)
+{
     if (!real_pthread_mutex_lock) {
         real_pthread_mutex_lock = dlsym(RTLD_NEXT, "pthread_mutex_lock");
     }
@@ -23,30 +24,25 @@ static void init_real_functions(void) {
     }
 }
 
-__attribute__((constructor)) static void lockdep_constructor(void) {
+__attribute__((constructor)) static void lockdep_constructor(void)
+{
     lockdep_init();
     init_real_functions();
 }
 
-__attribute__((destructor)) static void lockdep_destructor(void) {
-    lockdep_cleanup();
-}
-
 /// The lockdep uses a mutex to protect its internal state, so we use this to
-/// avoid recursing lockdep validation across itself
+/// avoid recursing lockdep validation across itself.
 static __thread bool in_interpose = false;
 
-int pthread_mutex_lock(pthread_mutex_t* mutex) {
+int pthread_mutex_lock(pthread_mutex_t* mutex)
+{
     init_real_functions();
 
     if (lockdep_enabled && !in_interpose) {
         in_interpose = true;
         if (!lockdep_acquire_lock(mutex)) {
-            fprintf(
-                stderr,
-                "[LOCKDEP] DEADLOCK PREVENTED - refusing to acquire lock\n");
+            fprintf(stderr, "[LOCKDEP] DEADLOCK DETECTED\n");
             in_interpose = false;
-            return EDEADLK;
         }
         in_interpose = false;
     }
@@ -56,11 +52,11 @@ int pthread_mutex_lock(pthread_mutex_t* mutex) {
     return result;
 }
 
-int pthread_mutex_unlock(pthread_mutex_t* mutex) {
+int pthread_mutex_unlock(pthread_mutex_t* mutex)
+{
     init_real_functions();
 
     int result = real_pthread_mutex_unlock(mutex);
-
     if (lockdep_enabled && !in_interpose) {
         in_interpose = true;
         lockdep_release_lock(mutex);
@@ -70,17 +66,16 @@ int pthread_mutex_unlock(pthread_mutex_t* mutex) {
     return result;
 }
 
-int pthread_mutex_trylock(pthread_mutex_t* mutex) {
+int pthread_mutex_trylock(pthread_mutex_t* mutex)
+{
     init_real_functions();
 
     int result = real_pthread_mutex_trylock(mutex);
-
     if (result == 0 && lockdep_enabled && !in_interpose) {
         in_interpose = true;
         if (!lockdep_acquire_lock(mutex)) {
-            fprintf(stderr,
-                    "[LOCKDEP] DEADLOCK DETECTED on trylock - unlocking and "
-                    "failing\n");
+            fprintf(stderr, "[LOCKDEP] DEADLOCK DETECTED on trylock - unlocking and "
+                            "failing\n");
             real_pthread_mutex_unlock(mutex);
             in_interpose = false;
             return EBUSY;

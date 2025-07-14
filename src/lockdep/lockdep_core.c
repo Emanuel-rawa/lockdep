@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "lockdep.h"
+#include "../include/lockdep.h"
 
 bool lockdep_enabled = true;
 

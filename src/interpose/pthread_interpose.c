@@ -4,7 +4,7 @@
 #include <semaphore.h>
 #include <stdio.h>
 
-#include "lockdep.h"
+#include "../include/lockdep.h"
 
 static int (*real_pthread_mutex_lock)(pthread_mutex_t*) = NULL;
 static int (*real_pthread_mutex_unlock)(pthread_mutex_t*) = NULL;
